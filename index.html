@@ -1,0 +1,1446 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="manifest.json" />
+    <title>.gift — Regali digitali che emozionano</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+      :root {
+        --bg: #07070f;
+        --surface: #10101c;
+        --surface2: #18182a;
+        --gold: #c9a84c;
+        --gold-light: #e8c97a;
+        --gold-dim: rgba(201, 168, 76, 0.18);
+        --text: #ede8dc;
+        --text-muted: #7a7060;
+        --border: rgba(201, 168, 76, 0.18);
+        --r: 10px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-weight: 300;
+        overflow-x: hidden;
+      }
+      .screen {
+        display: none;
+        min-height: 100vh;
+        flex-direction: column;
+      }
+      .screen.active {
+        display: flex;
+      }
+
+      /* ── HOME ─────────────────────────────────── */
+      #screen-home {
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .home-glow {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(201, 168, 76, 0.07) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .home-logo {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 88px;
+        font-weight: 300;
+        color: var(--gold-light);
+        letter-spacing: -3px;
+        line-height: 1;
+        margin-bottom: 14px;
+        animation: fadeUp 0.9s ease-out both;
+      }
+      .home-tag {
+        font-size: 15px;
+        color: var(--text-muted);
+        letter-spacing: 0.4px;
+        margin-bottom: 56px;
+        animation: fadeUp 0.9s 0.15s ease-out both;
+      }
+      .home-btns {
+        display: flex;
+        gap: 16px;
+        animation: fadeUp 0.9s 0.3s ease-out both;
+      }
+      .home-version {
+        position: absolute;
+        bottom: 28px;
+        font-size: 11px;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        opacity: 0.5;
+      }
+
+      /* ── BUTTONS ──────────────────────────────── */
+      .btn {
+        font-family: "DM Sans", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        padding: 15px 40px;
+        border-radius: 3px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+      }
+      .btn-gold {
+        background: var(--gold);
+        color: #1a0f00;
+      }
+      .btn-gold:hover {
+        background: var(--gold-light);
+        transform: translateY(-2px);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--gold);
+        border: 1px solid var(--border);
+      }
+      .btn-outline:hover {
+        border-color: var(--gold);
+        transform: translateY(-2px);
+      }
+      .btn-full {
+        width: 100%;
+        padding: 15px;
+      }
+      .btn-ghost-sm {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        color: var(--text-muted);
+        width: 100%;
+        padding: 13px;
+        border-radius: 3px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 10px;
+      }
+      .btn-ghost-sm:hover {
+        border-color: rgba(255, 255, 255, 0.15);
+        color: var(--text);
+      }
+      .btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* ── BUILDER ──────────────────────────────── */
+      #screen-builder {
+        align-items: center;
+        padding: 36px 24px 60px;
+        background: var(--bg);
+      }
+      .builder-nav {
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 44px;
+      }
+      .back-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.2s;
+      }
+      .back-btn:hover {
+        color: var(--text);
+      }
+      .steps {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .sdot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--surface2);
+        transition: all 0.3s;
+      }
+      .sdot.on {
+        background: var(--gold);
+      }
+      .sdot.done {
+        background: var(--gold);
+        opacity: 0.4;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 600px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 40px;
+      }
+      .card-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 30px;
+        font-weight: 400;
+        color: var(--gold-light);
+        margin-bottom: 6px;
+      }
+      .card-sub {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 32px;
+        line-height: 1.6;
+      }
+      label {
+        display: block;
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 7px;
+      }
+      input[type="text"],
+      input[type="password"],
+      textarea,
+      select {
+        width: 100%;
+        background: var(--surface2);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 6px;
+        padding: 12px 15px;
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 300;
+        margin-bottom: 22px;
+        transition: border-color 0.2s;
+        outline: none;
+      }
+      input[type="text"]:focus,
+      input[type="password"]:focus,
+      textarea:focus {
+        border-color: var(--gold);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 72px;
+        line-height: 1.6;
+      }
+      select {
+        cursor: pointer;
+        appearance: none;
+      }
+      .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .dropzone {
+        border: 1px dashed rgba(201, 168, 76, 0.25);
+        border-radius: var(--r);
+        padding: 44px 24px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 22px;
+      }
+      .dropzone:hover,
+      .dropzone.drag {
+        border-color: var(--gold);
+        background: rgba(201, 168, 76, 0.03);
+      }
+      .dropzone.ok {
+        border-style: solid;
+        border-color: rgba(201, 168, 76, 0.4);
+        background: rgba(201, 168, 76, 0.04);
+      }
+      .dz-icon {
+        font-size: 34px;
+        margin-bottom: 10px;
+        opacity: 0.65;
+      }
+      .dz-text {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+      .dz-text strong {
+        color: var(--gold-light);
+      }
+
+      .slide-row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        margin-bottom: 10px;
+      }
+      .slide-row textarea {
+        margin-bottom: 0;
+        flex: 1;
+      }
+      .snum {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--surface2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        margin-top: 12px;
+      }
+      .rm-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 11px 3px;
+        font-size: 20px;
+        line-height: 1;
+        transition: color 0.2s;
+      }
+      .rm-btn:hover {
+        color: #e24b4a;
+      }
+      .add-slide {
+        background: none;
+        border: 1px dashed rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+        padding: 10px;
+        width: 100%;
+        color: var(--text-muted);
+        font-family: "DM Sans", sans-serif;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 22px;
+        letter-spacing: 0.5px;
+      }
+      .add-slide:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+
+      .key-box {
+        background: rgba(201, 168, 76, 0.07);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 22px;
+        text-align: center;
+        margin-bottom: 22px;
+      }
+      .key-box-label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+      .key-box-val {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 30px;
+        color: var(--gold-light);
+        letter-spacing: 4px;
+        word-break: break-all;
+      }
+      .success-pill {
+        background: rgba(99, 193, 118, 0.12);
+        border: 1px solid rgba(99, 193, 118, 0.3);
+        border-radius: 6px;
+        padding: 18px 20px;
+        margin-top: 20px;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #a0d8b0;
+        text-align: center;
+      }
+      .success-pill strong {
+        color: var(--gold);
+      }
+
+      /* ── VIEWER ────────────────────────────────── */
+      #screen-viewer {
+        position: relative;
+      }
+      #cvs {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+      .vphase {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 40px;
+        text-align: center;
+        position: relative;
+        z-index: 10;
+      }
+      .vphase.on {
+        display: flex;
+      }
+
+      /* upload */
+      #vp-upload {
+        background: radial-gradient(
+          ellipse at center,
+          #130d22 0%,
+          var(--bg) 65%
+        );
+      }
+
+      /* unbox */
+      .gbox-wrap {
+        margin-bottom: 40px;
+        animation: float 3s ease-in-out infinite;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-14px);
+        }
+      }
+      @keyframes pop {
+        0% {
+          transform: scale(1) rotate(0deg);
+        }
+        30% {
+          transform: scale(1.3) rotate(-8deg);
+        }
+        60% {
+          transform: scale(0.9) rotate(5deg);
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+        }
+      }
+      .gbox-wrap.pop {
+        animation: pop 0.5s ease-out;
+      }
+      .gbox {
+        font-size: 96px;
+        line-height: 1;
+        display: block;
+        filter: drop-shadow(0 0 48px rgba(201, 168, 76, 0.25));
+      }
+      .from-to-sender {
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: 14px;
+        color: var(--text-muted);
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+      }
+      .from-to-recv {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 34px;
+        color: var(--gold-light);
+        margin-bottom: 44px;
+        letter-spacing: 0.5px;
+      }
+
+      /* slides */
+      .slide-txt {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 44px;
+        font-weight: 300;
+        max-width: 660px;
+        line-height: 1.45;
+        animation: fadeUp 0.7s ease-out both;
+      }
+      .slide-dots {
+        display: flex;
+        gap: 7px;
+        margin-top: 44px;
+      }
+      .sdot2 {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.15);
+        transition: background 0.3s;
+      }
+      .sdot2.on {
+        background: var(--gold);
+      }
+
+      /* key */
+      .key-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 38px;
+        color: var(--gold-light);
+        margin-bottom: 10px;
+      }
+      .key-sub {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 40px;
+        max-width: 380px;
+        line-height: 1.7;
+      }
+      .key-input {
+        width: 100%;
+        max-width: 340px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 16px 24px;
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 22px;
+        text-align: center;
+        letter-spacing: 6px;
+        outline: none;
+        margin-bottom: 16px;
+        transition: border-color 0.2s;
+      }
+      .key-input:focus {
+        border-color: var(--gold);
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-8px);
+        }
+        40% {
+          transform: translateX(8px);
+        }
+        60% {
+          transform: translateX(-6px);
+        }
+        80% {
+          transform: translateX(6px);
+        }
+      }
+      .key-input.err {
+        border-color: #e24b4a !important;
+        animation: shake 0.4s;
+      }
+      .err-msg {
+        height: 18px;
+        font-size: 12px;
+        color: #e24b4a;
+        margin-bottom: 20px;
+      }
+
+      /* success */
+      .suc-icon {
+        font-size: 64px;
+        margin-bottom: 22px;
+      }
+      .suc-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 46px;
+        color: var(--gold-light);
+        margin-bottom: 10px;
+      }
+      .suc-sub {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 44px;
+        max-width: 380px;
+        line-height: 1.7;
+      }
+      .autodestruct {
+        margin-top: 36px;
+        font-size: 11px;
+        color: rgba(201, 168, 76, 0.3);
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        animation: blink 2.5s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      /* shared animations */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════════════════════════ HOME ══ -->
+    <div id="screen-home" class="screen active">
+      <div class="home-glow"></div>
+      <div class="home-logo">.gift</div>
+      <p class="home-tag">Il formato che trasforma un file in un'emozione</p>
+      <div class="home-btns">
+        <button class="btn btn-gold" onclick="goTo('builder')">
+          🎁 Crea un regalo
+        </button>
+        <button class="btn btn-outline" onclick="goTo('viewer')">
+          ✉ Apri un regalo
+        </button>
+      </div>
+      <p class="home-version">Prototype · Format v1.0</p>
+    </div>
+
+    <!-- ═══════════════════════════════ BUILDER ══ -->
+    <div id="screen-builder" class="screen">
+      <div class="builder-nav">
+        <button class="back-btn" onclick="goTo('home')">← Indietro</button>
+        <div class="steps">
+          <div class="sdot on" id="d1"></div>
+          <div class="sdot" id="d2"></div>
+          <div class="sdot" id="d3"></div>
+        </div>
+        <div style="width: 64px"></div>
+      </div>
+
+      <!-- Step 1 -->
+      <div id="bs1" class="card">
+        <div class="card-title">Il regalo</div>
+        <p class="card-sub">
+          Carica il file (PDF, immagine, biglietto...) e indica chi invia e chi
+          riceve.
+        </p>
+
+        <div
+          class="dropzone"
+          id="dz"
+          onclick="document.getElementById('fi').click()"
+        >
+          <div class="dz-icon">📄</div>
+          <p class="dz-text">
+            <strong>Clicca per scegliere</strong> o trascina qui il file
+          </p>
+          <p
+            class="dz-text"
+            style="font-size: 12px; margin-top: 5px; opacity: 0.6"
+          >
+            PDF · Immagini · Qualsiasi file digitale
+          </p>
+        </div>
+        <input type="file" id="fi" hidden />
+
+        <div class="row2">
+          <div>
+            <label>Da</label>
+            <input type="text" id="b-from" placeholder="Il tuo nome" />
+          </div>
+          <div>
+            <label>Per</label>
+            <input type="text" id="b-to" placeholder="Nome destinatario" />
+          </div>
+        </div>
+        <button class="btn btn-gold btn-full" onclick="step2()">
+          Continua →
+        </button>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="bs2" class="card hidden">
+        <div class="card-title">Il messaggio</div>
+        <p class="card-sub">
+          Scrivi cosa vuoi dire. Ogni slide viene mostrata una alla volta
+          durante l'apertura.
+        </p>
+        <div id="slides-wrap"></div>
+        <button class="add-slide" onclick="addSlide()">
+          + Aggiungi diapositiva
+        </button>
+        <button class="btn btn-gold btn-full" onclick="step3()">
+          Continua →
+        </button>
+        <button class="btn-ghost-sm" onclick="step1back()">← Indietro</button>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="bs3" class="card hidden">
+        <div class="card-title">La chiave segreta</div>
+        <p class="card-sub">
+          Il file verrà cifrato con questa parola. Inviala al destinatario su un
+          canale separato — senza di essa il regalo è illeggibile.
+        </p>
+
+        <label>Chiave</label>
+        <input
+          type="text"
+          id="b-key"
+          placeholder="es. fragola · napoli · estate2024..."
+          oninput="previewKey(this.value)"
+        />
+
+        <div class="key-box hidden" id="kb">
+          <div class="key-box-label">Cifrato con la parola</div>
+          <div class="key-box-val" id="kbv"></div>
+        </div>
+
+        <label style="margin-top: 4px">Animazione apertura</label>
+        <select id="b-anim" style="margin-bottom: 26px">
+          <option value="confetti">🎊 Coriandoli</option>
+          <option value="stars">⭐ Stelle</option>
+          <option value="hearts">❤ Cuori</option>
+        </select>
+
+        <button class="btn btn-gold btn-full" id="btn-gen" onclick="generate()">
+          🎁 Genera il .gift
+        </button>
+        <button class="btn-ghost-sm" onclick="step2back()">← Indietro</button>
+
+        <div class="success-pill hidden" id="gen-ok">
+          ✓ File <strong id="gen-name"></strong> creato e scaricato.<br />
+          Invia la chiave <strong>"<span id="gen-key"></span>"</strong> al
+          destinatario su un canale separato. <br /><br />
+          <button
+            class="btn btn-outline"
+            onclick="goTo('home')"
+            style="padding: 11px 32px; font-size: 11px"
+          >
+            Torna alla home
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ VIEWER ══ -->
+    <div id="screen-viewer" class="screen">
+      <canvas id="cvs"></canvas>
+
+      <!-- Upload -->
+      <div id="vp-upload" class="vphase on">
+        <button
+          class="back-btn"
+          onclick="goTo('home')"
+          style="position: absolute; top: 32px; left: 40px"
+        >
+          ← Torna
+        </button>
+        <div
+          style="
+            font-family: &quot;Cormorant Garamond&quot;, serif;
+            font-size: 50px;
+            color: var(--gold-light);
+            margin-bottom: 14px;
+            font-weight: 300;
+          "
+        >
+          Apri il tuo regalo
+        </div>
+        <p
+          style="font-size: 13px; color: var(--text-muted); margin-bottom: 48px"
+        >
+          Trascina o clicca per caricare il file .gift
+        </p>
+        <div
+          class="dropzone"
+          id="gdz"
+          style="max-width: 480px; width: 100%"
+          onclick="document.getElementById('gi').click()"
+        >
+          <div class="dz-icon">🎁</div>
+          <p class="dz-text"><strong>Scegli il file .gift</strong></p>
+          <p
+            class="dz-text"
+            style="font-size: 12px; margin-top: 5px; opacity: 0.6"
+          >
+            Il formato regalo digitale
+          </p>
+        </div>
+        <input type="file" id="gi" accept=".gift,.zip" hidden />
+      </div>
+
+      <!-- Unbox -->
+      <div id="vp-unbox" class="vphase">
+        <div class="gbox-wrap" id="gbox-wrap">
+          <span class="gbox" id="gbox">🎁</span>
+        </div>
+        <p class="from-to-sender" id="vfrom"></p>
+        <p class="from-to-recv" id="vto"></p>
+        <button
+          class="btn btn-gold"
+          onclick="openBox()"
+          style="padding: 15px 56px; letter-spacing: 2px"
+        >
+          Apri il regalo
+        </button>
+      </div>
+
+      <!-- Slides -->
+      <div id="vp-slides" class="vphase">
+        <div class="slide-txt" id="stxt"></div>
+        <div class="slide-dots" id="sdots"></div>
+        <div style="margin-top: 52px">
+          <button
+            class="btn btn-outline"
+            id="snext"
+            onclick="nextSlide()"
+            style="min-width: 200px; padding: 14px 44px"
+          >
+            Avanti →
+          </button>
+        </div>
+      </div>
+
+      <!-- Key -->
+      <div id="vp-key" class="vphase">
+        <div style="font-size: 52px; margin-bottom: 22px">🔑</div>
+        <div class="key-title">Inserisci la chiave</div>
+        <p class="key-sub">
+          Il mittente ti ha inviato la parola chiave separatamente. Inseriscila
+          per sbloccare il regalo.
+        </p>
+        <input
+          type="text"
+          class="key-input"
+          id="kinput"
+          placeholder="·  ·  ·  ·  ·  ·"
+          autocomplete="off"
+          oninput="clearKeyErr()"
+        />
+        <div class="err-msg" id="kerr"></div>
+        <button
+          class="btn btn-gold"
+          onclick="decrypt()"
+          style="min-width: 260px; padding: 15px 44px"
+        >
+          Sblocca il regalo
+        </button>
+      </div>
+
+      <!-- Success -->
+      <div id="vp-suc" class="vphase">
+        <div class="suc-icon">🎉</div>
+        <div class="suc-title">Il regalo è tuo!</div>
+        <p class="suc-sub" id="suc-sub">
+          Il file è stato estratto con successo.
+        </p>
+        <button
+          class="btn btn-gold"
+          id="btn-dl"
+          style="min-width: 260px; padding: 15px 44px; margin-bottom: 12px"
+        >
+          ⬇ Scarica il regalo
+        </button>
+        <button
+          class="btn btn-outline"
+          onclick="goTo('home')"
+          style="min-width: 260px; padding: 15px 44px"
+        >
+          Torna alla home
+        </button>
+        <p class="autodestruct">
+          ⚡ .gift consumato — autodistruzione completata
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Registrazione Service Worker per l'offline
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
+      }
+
+      // Gestione apertura automatica file dal sistema operativo
+      if ("launchQueue" in window) {
+        launchQueue.setConsumer(async (launchParams) => {
+          if (launchParams.files && launchParams.files.length > 0) {
+            const file = await launchParams.files[0].getFile();
+            // Passiamo il file direttamente alla tua funzione esistente
+            loadGift(file);
+          }
+        });
+      }
+      // ═══════════════ UTILS ════════════════════
+
+      function xor(u8, key) {
+        const k = new TextEncoder().encode(key);
+        const r = new Uint8Array(u8.length);
+        for (let i = 0; i < u8.length; i++) r[i] = u8[i] ^ k[i % k.length];
+        return r;
+      }
+
+      function toB64(u8) {
+        let s = "";
+        const cs = 8192;
+        for (let i = 0; i < u8.length; i += cs)
+          s += String.fromCharCode.apply(
+            null,
+            u8.subarray(i, Math.min(i + cs, u8.length)),
+          );
+        return btoa(s);
+      }
+
+      function fromB64(b64) {
+        const b = atob(b64),
+          u = new Uint8Array(b.length);
+        for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i);
+        return u;
+      }
+
+      function showScreen(id) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById("screen-" + id).classList.add("active");
+      }
+
+      function showVPhase(id) {
+        document
+          .querySelectorAll(".vphase")
+          .forEach((p) => p.classList.remove("on"));
+        document.getElementById("vp-" + id).classList.add("on");
+      }
+
+      function goTo(s) {
+        if (s === "builder") builderReset();
+        if (s === "viewer") viewerReset();
+        showScreen(s);
+      }
+
+      // ═══════════════ CONFETTI ══════════════════
+
+      const cvs = document.getElementById("cvs");
+      const ctx2 = cvs.getContext("2d");
+      let particles = [],
+        animId;
+
+      function resize() {
+        cvs.width = innerWidth;
+        cvs.height = innerHeight;
+      }
+      addEventListener("resize", resize);
+      resize();
+
+      function burst(type) {
+        const shapes =
+          type === "hearts"
+            ? ["❤", "💕", "💖"]
+            : type === "stars"
+              ? ["⭐", "✨", "💫"]
+              : null;
+        const cols = [
+          "#c9a84c",
+          "#e8c97a",
+          "#fff",
+          "#e24b4a",
+          "#63c176",
+          "#378add",
+          "#f0997b",
+        ];
+        for (let i = 0; i < 160; i++) {
+          particles.push({
+            x: Math.random() * cvs.width,
+            y: -10 - Math.random() * cvs.height * 0.35,
+            sz: 7 + Math.random() * 11,
+            col: cols[Math.floor(Math.random() * cols.length)],
+            vy: 1.8 + Math.random() * 3.5,
+            vx: (Math.random() - 0.5) * 2.5,
+            rot: Math.random() * 360,
+            rspd: (Math.random() - 0.5) * 9,
+            alpha: 1,
+            shape: shapes
+              ? shapes[Math.floor(Math.random() * shapes.length)]
+              : null,
+          });
+        }
+        cancelAnimationFrame(animId);
+        tick();
+      }
+
+      function tick() {
+        ctx2.clearRect(0, 0, cvs.width, cvs.height);
+        particles = particles.filter((p) => p.alpha > 0.05);
+        particles.forEach((p) => {
+          p.y += p.vy;
+          p.x += p.vx;
+          p.rot += p.rspd;
+          if (p.y > cvs.height * 0.65) p.alpha -= 0.018;
+          ctx2.save();
+          ctx2.translate(p.x, p.y);
+          ctx2.rotate((p.rot * Math.PI) / 180);
+          ctx2.globalAlpha = p.alpha;
+          if (p.shape) {
+            ctx2.font = p.sz + "px serif";
+            ctx2.textAlign = "center";
+            ctx2.textBaseline = "middle";
+            ctx2.fillText(p.shape, 0, 0);
+          } else {
+            ctx2.fillStyle = p.col;
+            ctx2.fillRect(-p.sz / 2, -p.sz / 4, p.sz, p.sz / 2);
+          }
+          ctx2.restore();
+        });
+        if (particles.length > 0) animId = requestAnimationFrame(tick);
+      }
+
+      // ═══════════════ BUILDER ══════════════════
+
+      let bState = { file: null, buf: null, slides: [""] };
+
+      function setDots(n) {
+        [1, 2, 3].forEach((i) => {
+          const d = document.getElementById("d" + i);
+          d.className = "sdot" + (i === n ? " on" : i < n ? " done" : "");
+        });
+      }
+
+      function builderReset() {
+        bState = { file: null, buf: null, slides: [""] };
+        document.getElementById("b-from").value = "";
+        document.getElementById("b-to").value = "";
+        document.getElementById("b-key").value = "";
+        document.getElementById("kb").classList.add("hidden");
+        document.getElementById("gen-ok").classList.add("hidden");
+        document.getElementById("btn-gen").classList.remove("hidden");
+        const dz = document.getElementById("dz");
+        dz.className = "dropzone";
+        dz.innerHTML =
+          '<div class="dz-icon">📄</div><p class="dz-text"><strong>Clicca per scegliere</strong> o trascina qui il file</p><p class="dz-text" style="font-size:12px;margin-top:5px;opacity:.6">PDF · Immagini · Qualsiasi file digitale</p>';
+        document.getElementById("bs1").classList.remove("hidden");
+        document.getElementById("bs2").classList.add("hidden");
+        document.getElementById("bs3").classList.add("hidden");
+        setDots(1);
+      }
+
+      function step2() {
+        if (!bState.file) {
+          alert("Carica prima un file regalo");
+          return;
+        }
+        const from = document.getElementById("b-from").value.trim();
+        const to = document.getElementById("b-to").value.trim();
+        if (!from || !to) {
+          alert("Inserisci mittente e destinatario");
+          return;
+        }
+        document.getElementById("bs1").classList.add("hidden");
+        document.getElementById("bs2").classList.remove("hidden");
+        setDots(2);
+        renderSlides();
+      }
+
+      function step1back() {
+        bState.slides = getSlides();
+        document.getElementById("bs2").classList.add("hidden");
+        document.getElementById("bs1").classList.remove("hidden");
+        setDots(1);
+      }
+
+      function step3() {
+        const s = getSlides();
+        if (!s.length || !s[0]) {
+          alert("Scrivi almeno un messaggio");
+          return;
+        }
+        bState.slides = s;
+        document.getElementById("bs2").classList.add("hidden");
+        document.getElementById("bs3").classList.remove("hidden");
+        setDots(3);
+      }
+
+      function step2back() {
+        document.getElementById("bs3").classList.add("hidden");
+        document.getElementById("bs2").classList.remove("hidden");
+        setDots(2);
+        renderSlides();
+      }
+
+      function getSlides() {
+        return Array.from(document.querySelectorAll(".starea"))
+          .map((t) => t.value.trim())
+          .filter(Boolean);
+      }
+
+      function renderSlides() {
+        const w = document.getElementById("slides-wrap");
+        w.innerHTML = "";
+        const slides = bState.slides.length ? bState.slides : [""];
+        slides.forEach((txt, i) => {
+          const d = document.createElement("div");
+          d.className = "slide-row";
+          d.innerHTML = `
+      <div class="snum">${i + 1}</div>
+      <textarea class="starea" rows="2" placeholder="Messaggio diapositiva ${i + 1}...">${txt}</textarea>
+      ${slides.length > 1 ? `<button class="rm-btn" onclick="rmSlide(${i})" title="Rimuovi">×</button>` : ""}
+    `;
+          w.appendChild(d);
+        });
+      }
+
+      function addSlide() {
+        bState.slides = getSlides();
+        bState.slides.push("");
+        renderSlides();
+      }
+
+      function rmSlide(i) {
+        bState.slides = getSlides();
+        bState.slides.splice(i, 1);
+        renderSlides();
+      }
+
+      function previewKey(v) {
+        const kb = document.getElementById("kb");
+        const kbv = document.getElementById("kbv");
+        if (v.trim().length >= 2) {
+          kb.classList.remove("hidden");
+          kbv.textContent = v.trim().toUpperCase();
+        } else {
+          kb.classList.add("hidden");
+        }
+      }
+
+      async function generate() {
+        const keyStr = document.getElementById("b-key").value.trim();
+        if (!keyStr) {
+          alert("Inserisci una chiave segreta");
+          return;
+        }
+
+        const btn = document.getElementById("btn-gen");
+        btn.disabled = true;
+        btn.textContent = "Cifratura AES...";
+
+        try {
+          const encoder = new TextEncoder();
+          const keyBase = encoder.encode(keyStr);
+
+          // Creazione di una chiave crittografica reale dalla stringa testuale
+          const hash = await crypto.subtle.digest("SHA-256", keyBase);
+          const cryptoKey = await crypto.subtle.importKey(
+            "raw",
+            hash,
+            "AES-GCM",
+            false,
+            ["encrypt"],
+          );
+
+          // IV (Initialization Vector) - Un "sale" per rendere ogni cifratura unica
+          const iv = crypto.getRandomValues(new Uint8Array(12));
+
+          // Cifratura del payload
+          const encryptedBuf = await crypto.subtle.encrypt(
+            { name: "AES-GCM", iv: iv },
+            cryptoKey,
+            bState.buf,
+          );
+
+          const manifest = {
+            version: "1.1", // Update version
+            sender: document.getElementById("b-from").value.trim(),
+            receiver: document.getElementById("b-to").value.trim(),
+            slides: getSlides().map((t) => ({ text: t, duration: 4 })),
+            animation: document.getElementById("b-anim").value,
+            // Metadati crittografici necessari per la decifratura
+            crypto: {
+              iv: toB64(iv),
+              method: "AES-GCM-256",
+            },
+            payload: {
+              filename: bState.file.name,
+              mimetype: bState.file.type || "application/octet-stream",
+              data: toB64(new Uint8Array(encryptedBuf)),
+            },
+          };
+
+          const zip = new JSZip();
+          zip.file("manifest.json", JSON.stringify(manifest, null, 2));
+          const blob = await zip.generateAsync({
+            type: "blob",
+            compression: "DEFLATE",
+          });
+
+          // Download automatico
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = `regalo_per_${manifest.receiver.replace(/\s+/g, "_").toLowerCase()}.gift`;
+          a.click();
+
+          document.getElementById("gen-key").textContent = keyStr;
+          document.getElementById("gen-ok").classList.remove("hidden");
+          btn.classList.add("hidden");
+        } catch (e) {
+          alert("Errore crittografico: " + e.message);
+        }
+        btn.disabled = false;
+      }
+
+      // Drop zone - builder
+      const dz = document.getElementById("dz");
+      const fi = document.getElementById("fi");
+      dz.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dz.classList.add("drag");
+      });
+      dz.addEventListener("dragleave", () => dz.classList.remove("drag"));
+      dz.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dz.classList.remove("drag");
+        if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+      });
+      fi.addEventListener("change", (e) => {
+        if (e.target.files[0]) loadFile(e.target.files[0]);
+      });
+
+      async function loadFile(f) {
+        bState.file = f;
+        bState.buf = await f.arrayBuffer();
+        dz.className = "dropzone ok";
+        dz.innerHTML = `<div class="dz-icon">✅</div><p class="dz-text"><strong>${f.name}</strong></p><p class="dz-text" style="font-size:12px;margin-top:4px;opacity:.6">${(f.size / 1024).toFixed(0)} KB — clicca per cambiare</p>`;
+      }
+
+      // ═══════════════ VIEWER ═══════════════════
+
+      let manifest = null,
+        curSlide = 0,
+        decBlob = null;
+
+      function viewerReset() {
+        manifest = null;
+        curSlide = 0;
+        decBlob = null;
+        particles = [];
+        ctx2.clearRect(0, 0, cvs.width, cvs.height);
+        document.getElementById("gi").value = "";
+        document.getElementById("kinput").value = "";
+        clearKeyErr();
+        showVPhase("upload");
+      }
+
+      const gdz = document.getElementById("gdz");
+      const gi = document.getElementById("gi");
+      gdz.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        gdz.classList.add("drag");
+      });
+      gdz.addEventListener("dragleave", () => gdz.classList.remove("drag"));
+      gdz.addEventListener("drop", (e) => {
+        e.preventDefault();
+        gdz.classList.remove("drag");
+        if (e.dataTransfer.files[0]) loadGift(e.dataTransfer.files[0]);
+      });
+      gi.addEventListener("change", (e) => {
+        if (e.target.files[0]) loadGift(e.target.files[0]);
+      });
+
+      async function loadGift(f) {
+        try {
+          const ab = await f.arrayBuffer();
+          const zip = await JSZip.loadAsync(ab);
+          const mf = zip.file("manifest.json");
+          if (!mf) throw new Error("File .gift non valido");
+          const text = await mf.async("string");
+          manifest = JSON.parse(text);
+
+          document.getElementById("vfrom").textContent =
+            "Da " + (manifest.sender || "—");
+          document.getElementById("vto").textContent =
+            "Per " + (manifest.receiver || "—");
+
+          const icons = { confetti: "🎁", stars: "✨", hearts: "💝" };
+          document.getElementById("gbox").textContent =
+            icons[manifest.animation] || "🎁";
+
+          showVPhase("unbox");
+          setTimeout(() => burst(manifest.animation || "confetti"), 400);
+        } catch (e) {
+          alert("Errore apertura .gift: " + e.message);
+        }
+      }
+
+      function openBox() {
+        const w = document.getElementById("gbox-wrap");
+        w.classList.remove("pop");
+        void w.offsetWidth;
+        w.classList.add("pop");
+        burst(manifest.animation || "confetti");
+        setTimeout(() => {
+          if (manifest.slides && manifest.slides.length > 0) {
+            curSlide = 0;
+            showVPhase("slides");
+            renderSlide();
+          } else {
+            showVPhase("key");
+            document.getElementById("kinput").focus();
+          }
+        }, 600);
+      }
+
+      function renderSlide() {
+        const slides = manifest.slides;
+        const el = document.getElementById("stxt");
+        el.style.animation = "none";
+        void el.offsetWidth;
+        el.style.animation = "";
+        el.textContent = slides[curSlide].text;
+
+        const dots = document.getElementById("sdots");
+        dots.innerHTML = "";
+        slides.forEach((_, i) => {
+          const d = document.createElement("div");
+          d.className = "sdot2" + (i === curSlide ? " on" : "");
+          dots.appendChild(d);
+        });
+
+        document.getElementById("snext").textContent =
+          curSlide >= slides.length - 1 ? "Apri il regalo 🔑" : "Avanti →";
+      }
+
+      function nextSlide() {
+        if (curSlide < manifest.slides.length - 1) {
+          curSlide++;
+          renderSlide();
+        } else {
+          showVPhase("key");
+          setTimeout(() => document.getElementById("kinput").focus(), 300);
+        }
+      }
+
+      function clearKeyErr() {
+        document.getElementById("kerr").textContent = "";
+        document.getElementById("kinput").classList.remove("err");
+      }
+
+      async function decrypt() {
+        const keyStr = document.getElementById("kinput").value.trim();
+        if (!keyStr) return;
+
+        try {
+          const encoder = new TextEncoder();
+          const keyBase = encoder.encode(keyStr);
+
+          // Ricostruiamo la stessa chiave partendo dalla password inserita
+          const hash = await crypto.subtle.digest("SHA-256", keyBase);
+          const cryptoKey = await crypto.subtle.importKey(
+            "raw",
+            hash,
+            "AES-GCM",
+            false,
+            ["decrypt"],
+          );
+
+          const iv = fromB64(manifest.crypto.iv);
+          const encryptedData = fromB64(manifest.payload.data);
+
+          // Tentativo di decifratura
+          const decryptedBuf = await crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: iv },
+            cryptoKey,
+            encryptedData,
+          );
+
+          decBlob = new Blob([decryptedBuf], {
+            type: manifest.payload.mimetype,
+          });
+
+          // UI di successo
+          document.getElementById("suc-sub").textContent =
+            `Regalo sbloccato! "${manifest.payload.filename}" è pronto.`;
+          document.getElementById("btn-dl").onclick = () => {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(decBlob);
+            a.download = manifest.payload.filename;
+            a.click();
+          };
+
+          showVPhase("suc");
+          burst("confetti");
+        } catch (e) {
+          // Se la chiave è sbagliata o il file è corrotto, AES-GCM lancia un errore
+          document.getElementById("kerr").textContent =
+            "Chiave errata o file compromesso.";
+          document.getElementById("kinput").classList.add("err");
+        }
+      }
+
+      document.getElementById("kinput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") decrypt();
+      });
+
+      // Questo codice intercetta il file lanciato dal sistema operativo
+      if ("launchQueue" in window) {
+        launchQueue.setConsumer(async (launchParams) => {
+          if (launchParams.files && launchParams.files.length > 0) {
+            const file = await launchParams.files[0].getFile();
+            // Funzione che hai già nel codice per processare il file
+            loadGift(file);
+          }
+        });
+      }
+
+      // Forza il caricamento dei file anche se l'app è già aperta
+      window.addEventListener("DOMContentLoaded", () => {
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("sw.js");
+        }
+      });
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("./sw.js")
+          .then(() => console.log("PWA pronta!"))
+          .catch((err) => console.log("Errore:", err));
+      }
+    </script>
+  </body>
+</html>
