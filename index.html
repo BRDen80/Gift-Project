@@ -1418,61 +1418,52 @@
         if (e.key === "Enter") decrypt();
       });
 
-      // Questo codice intercetta il file lanciato dal sistema operativo
-      if ("launchQueue" in window) {
-        launchQueue.setConsumer((launchParams) => {
-          // Se non ci sono file, non fare nulla (apertura normale)
-          if (!launchParams.files.length) {
-            return;
-          }
-
-          // Prendi il primo file della lista (.gift)
-          const fileHandle = launchParams.files[0];
-
-          // Leggi il file
-          fileHandle.getFile().then((file) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const contenuto = e.target.result;
-              try {
-                const datiRegalo = JSON.parse(contenuto);
-                // FUNZIONE DA CHIAMARE:
-                // Qui devi inserire il nome della funzione che usi per
-                // mostrare il regalo, passando 'datiRegalo'
-                apriRegaloDirettamente(datiRegalo);
-              } catch (err) {
-                console.error("Errore nel formato del file .gift", err);
-              }
-            };
-            reader.readAsText(file);
-          });
-        });
-      }
+      // Ricevitore per l'apertura dei file .gift
+if ('launchQueue' in window) {
+    launchQueue.setConsumer((launchParams) => {
+        if (launchParams.files && launchParams.files.length > 0) {
+            const fileHandle = launchParams.files[0];
+            
+            fileHandle.getFile().then(async (file) => {
+                const contenuto = await file.text();
+                try {
+                    const dati = JSON.parse(contenuto);
+                    // Forza l'apertura immediata
+                    apriRegaloDirettamente(dati);
+                } catch (e) {
+                    console.error("Errore lettura file:", e);
+                }
+            });
+        }
+    });
+}
 
       function apriRegaloDirettamente(datiRegalo) {
-        // 1. Nascondi il menu principale
-        const menu = document.getElementById("menu-principale");
-        if (menu) menu.style.display = "none";
+    // 1. Identifica i contenitori (ASSICURATI CHE QUESTI ID ESISTANO NELL'HTML)
+    const schermataIniziale = document.getElementById('main-menu'); 
+    const schermataRegalo = document.getElementById('gift-section'); 
 
-        // 2. Mostra la sezione del regalo
-        const areaRegalo = document.getElementById("area-regalo");
-        if (areaRegalo) areaRegalo.style.display = "block";
+    // 2. Nascondi il menu e mostra il regalo
+    if (schermataIniziale) schermataIniziale.style.display = 'none';
+    if (schermataRegalo) schermataRegalo.style.display = 'block';
 
-        // 3. Inserisci i dati (Esempio: titolo e messaggio)
-        // Qui usa le chiavi che hai salvato nel tuo JSON
-        document.getElementById("titolo-regalo").innerText =
-          datiRegalo.titolo || "Sorpresa!";
-        document.getElementById("messaggio-regalo").innerText =
-          datiRegalo.messaggio || "";
+    // 3. Inserisci i dati con controllo di sicurezza
+    const elTitolo = document.getElementById("titolo-regalo");
+    const elMessaggio = document.getElementById("messaggio-regalo");
+    const elImmagine = document.getElementById("immagine-regalo");
 
-        // Se hai immagini o video, caricali qui
-        if (datiRegalo.urlImmagine) {
-          document.getElementById("immagine-regalo").src =
-            datiRegalo.urlImmagine;
-        }
+    if (elTitolo) elTitolo.innerText = datiRegalo.titolo || "Sorpresa!";
+    if (elMessaggio) elMessaggio.innerText = datiRegalo.messaggio || "";
 
-        console.log("Regalo caricato con successo dal file!");
-      }
+    if (elImmagine && datiRegalo.urlImmagine) {
+        elImmagine.src = datiRegalo.urlImmagine;
+        elImmagine.style.display = 'block'; // Mostra l'immagine se esiste
+    } else if (elImmagine) {
+        elImmagine.style.display = 'none'; // Nascondila se non c'è URL
+    }
+
+    console.log("Regalo caricato con successo dal file!");
+}
 
       // Forza il caricamento dei file anche se l'app è già aperta
       window.addEventListener("DOMContentLoaded", () => {
