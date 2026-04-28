@@ -21,19 +21,11 @@
     }
   ],
   "file_handlers": [
-    {
-      "action": "/index.html",
-      "name": "Pacchetto Regalo .gift",
-      "accept": {
-        "application/x-gift": [".gift"]
-      },
-      "icons": [
-        {
-          "src": "icons/icona-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+  {
+    "action": "/regalo.html",
+    "accept": {
+      "application/x-gift": [".gift"]
     }
-  ]
+  }
+]
 }
